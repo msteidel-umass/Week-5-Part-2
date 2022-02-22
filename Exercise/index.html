@@ -3,44 +3,54 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Horizontal Stacked Bar Chart</title>
-	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="../libs/d3/d3.min.js"></script>
+	<style>
+		table, th, td {
+			border: 1px solid;
+		}
+	</style>
 </head>
 <body>
 <div style="width: 80%"></div>
 <script>
-	d3.csv('data_sample.csv', function(data) {
-		// the columns you'd like to display
-		var columns = ['date', 'EstimatedCost', 'RawMaterial', 'Workmanship', 'YearlyStorage'];
+	d3.csv("data_sample.csv").then(function(data) {
+		// The table generation function
+		function tabulate(data, columns) {
+			var table = d3.select("body").append("table")
+				thead = table.append("thead"),
+				tbody = table.append("tbody");
 
-		var table = d3.select('body').append('table');
-			thead = table.append('thead');
-			tbody = table.append('tbody');
+			// append the header row
+			thead.append("tr")
+				.selectAll("th")
+				.data(columns)
+				.enter()
+				.append("th")
+				.text(function(column) { return column; });
 
-		// append the header row
-		thead.append('tr')
-			.selectAll('th')
-			.data(columns)
-			.enter()
-			.append('th')
-			.text(function(column) { return column; });
+			// create a row for each object in the data
+			var rows = tbody.selectAll("tr")
+				.data(data)
+				.enter()
+				.append("tr");
 
-		// create a row for each object in the data
-		var rows = tbody.selectAll('tr')
-			.data(data)
-			.enter()
-			.append('tr');
+			// create a cell in each row for each column
+			var cells = rows.selectAll("td")
+				.data(function(row) {
+					return columns.map(function(column) {
+						return {column: column, value: row[column]};
+					});
+				})
+				.enter()
+				.append("td")
+				.html(function(d) { return d.value; });
 
-		// create a cell in each row for each column
-		var cells = rows.selectAll('td')
-			.data(function(row) {
-				return columns.map(function(column) {
-					return {column: column, value: row[column]};
-				});
-			})
-			.enter()
-			.append('td')
-			.text(function(d) { return d.value; });
-	});
+			return table;
+		}
+
+		// render the table
+		var peopleTable = tabulate(data, ['date','EstimatedCost','RawMaterial','Workmanship','YearlyStorage']);
+    });
 </script>
 </body>
 </html>
