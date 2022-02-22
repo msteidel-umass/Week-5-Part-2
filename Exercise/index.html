@@ -13,11 +13,22 @@
 <body>
 <div style="width: 80%"></div>
 <script>
-	d3.csv("data_sample.csv").then(function(data) {
+	d3.csv("data_sample.csv",d=>{
+		return {
+			date: new Date(d.date),
+			EstimatedCost: Number(d.EstimatedCost),
+			RawMaterial: Number(d.RawMaterial),
+			Workmanship: Number(d.Workmanship),
+			YearlyStorage: Number(d.YearlyStorage),
+			ActualCost: Number(d.ActualCost),
+			SoldPrice: Number(d.SoldPrice),
+			Margin_of_Profit: Number(d.Margin_of_Profit)
+		}
+	}).then(function(data) {
 		// The table generation function
 		function tabulate(data, columns) {
 			var table = d3.select("body").append("table")
-				thead = table.append("thead"),
+				thead = table.append("thead");
 				tbody = table.append("tbody");
 
 			// append the header row
@@ -35,6 +46,8 @@
 				.append("tr");
 
 			// create a cell in each row for each column
+			let row_array = [];
+			let count = 0;
 			var cells = rows.selectAll("td")
 				.data(function(row) {
 					return columns.map(function(column) {
@@ -43,14 +56,33 @@
 				})
 				.enter()
 				.append("td")
-				.html(function(d) { return d.value; });
+				.html(function(d) {
+					count += 1;
+					get_column = d.value;
+					row_array.push(get_column);
+					console.log(d);
+
+					if (d.column === 'ActualCost') {
+						let actual_cost = row_array[count - 4] + row_array[count - 3] + row_array[count - 2];
+						return actual_cost;
+					}
+					if (d.column === 'SoldPrice') {
+						let sold_price = (row_array[count - 6]*1.1).toFixed(2);
+						return sold_price;
+					}
+					if (d.column === 'Margin of Profit') {
+						let margin = ((row_array[count - 7]*1.1) - (row_array[count - 6] + row_array[count - 5] + row_array[count - 4])).toFixed(2);
+						return margin;
+					}
+					return d.value;
+				});
 
 			return table;
 		}
 
 		// render the table
-		var peopleTable = tabulate(data, ['date','EstimatedCost','RawMaterial','Workmanship','YearlyStorage']);
-    });
+		tabulate(data, ['date','EstimatedCost','RawMaterial','Workmanship','YearlyStorage', 'ActualCost', 'SoldPrice', 'Margin of Profit']);
+	});
 </script>
 </body>
 </html>
