@@ -63,16 +63,13 @@
 					console.log(d);
 
 					if (d.column === 'ActualCost') {
-						let actual_cost = row_array[count - 4] + row_array[count - 3] + row_array[count - 2];
-						return actual_cost;
+						return row_array[count - 4] + row_array[count - 3] + row_array[count - 2];
 					}
 					if (d.column === 'SoldPrice') {
-						let sold_price = (row_array[count - 6]*1.1).toFixed(2);
-						return sold_price;
+						return (row_array[count - 6]*1.1).toFixed(2);
 					}
 					if (d.column === 'Margin of Profit') {
-						let margin = ((row_array[count - 7]*1.1) - (row_array[count - 6] + row_array[count - 5] + row_array[count - 4])).toFixed(2);
-						return margin;
+						return ((row_array[count - 7]*1.1) - (row_array[count - 6] + row_array[count - 5] + row_array[count - 4])).toFixed(2);
 					}
 					return d.value;
 				});
